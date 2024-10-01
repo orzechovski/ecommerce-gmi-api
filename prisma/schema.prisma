@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id             String      @id @default(cuid()) // Unikalny identyfikator, string
+  title          String
+  subtitle       String?
+  description    String
+  handle         String      @unique
+  is_giftcard    Boolean     @default(false)
+  status         String      @default("draft") // "draft", "published", etc.
+  thumbnail      String?
+  profile_id     String?
+  weight         Float?
+  length         Float?
+  height         Float?
+  width          Float?
+  hs_code        String?
+  origin_country String?
+  mid_code       String?
+  material       String?
+  collection_id  String?
+  type_id        String?
+  discountable   Boolean     @default(true)
+  external_id    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?
+  metadata       Json?
+  OrderItems     OrderItem[] // Relacja do pozycji w zamówieniu
+  CartItem       CartItem[]
+}
+
+model Order {
+  id                  String      @id @default(cuid())
+  status              String      @default("pending") // "pending", "completed", etc.
+  fulfillment_status  String      @default("not_fulfilled")
+  payment_status      String      @default("not_paid")
+  display_id          Int
+  cart_id             String
+  customer_id         String
+  email               String
+  billing_address_id  String
+  shipping_address_id String
+  region_id           String
+  currency_code       String
+  tax_rate            Float       @default(0)
+  draft_order_id      String?
+  canceled_at         DateTime?
+  no_notification     Boolean     @default(false)
+  idempotency_key     String?
+  external_id         String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  deletedAt           DateTime?
+  metadata            Json?
+  items               OrderItem[] // Relacja do pozycji zamówień
+  Customer            Customer?   @relation(fields: [customerId], references: [id])
+  customerId          String?
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id                    String     @id @default(cuid())
+  email                 String
+  billing_address_id    String
+  shipping_address_id   String
+  region_id             String
+  customer_id           String
+  payment_session       Json?
+  payment_id            String?
+  type                  String     @default("default")
+  completed_at          DateTime?
+  payment_authorized_at DateTime?
+  idempotency_key       String?
+  context               Json?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  deletedAt             DateTime?
+  metadata              Json?
+  customer              Customer   @relation(fields: [customer_id], references: [id])
+  items                 CartItem[] // Relacja do produktów w koszyku
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    String
+  productId String
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  first_name         String
+  last_name          String
+  billing_address_id String
+  phone              String?
+  has_account        Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  metadata           Json?
+  carts              Cart[] // Relacja do koszyków
+  orders             Order[] // Relacja do zamówień
+}
