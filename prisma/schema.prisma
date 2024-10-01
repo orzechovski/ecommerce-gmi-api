@@ -12,12 +12,12 @@ model Product {
   title          String
   subtitle       String?
   description    String
-  handle         String      @unique
   is_giftcard    Boolean     @default(false)
   status         String      @default("draft") // "draft", "published", etc.
   thumbnail      String?
   profile_id     String?
   weight         Float?
+  price          Float
   length         Float?
   height         Float?
   width          Float?
