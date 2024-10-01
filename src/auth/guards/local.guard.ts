@@ -8,7 +8,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
   }
 
   canActivate(context: ExecutionContext) {
-    console.log('Inside LocalGuard');
     return super.canActivate(context);
   }
 }
