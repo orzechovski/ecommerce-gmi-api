@@ -77,33 +77,35 @@ model OrderItem {
 }
 
 model Cart {
-  id                    String     @id @default(cuid())
+  id                    String    @id @default(cuid()) // Unikalny identyfikator koszyka
   email                 String
-  billing_address_id    String
-  shipping_address_id   String
-  region_id             String
   customer_id           String
   payment_session       Json?
   payment_id            String?
-  type                  String     @default("default")
+  type                  String    @default("default")
   completed_at          DateTime?
   payment_authorized_at DateTime?
   idempotency_key       String?
   context               Json?
-  createdAt             DateTime   @default(now())
-  updatedAt             DateTime   @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
   deletedAt             DateTime?
   metadata              Json?
-  customer              Customer   @relation(fields: [customer_id], references: [id])
-  items                 CartItem[] // Relacja do produktów w koszyku
+
+  customer Customer @relation(fields: [customer_id], references: [id])
+
+  items CartItem[] @relation("CartToCartItems")
 }
 
 model CartItem {
-  id        Int      @id @default(autoincrement())
+  id        Int    @id @default(autoincrement()) // Unikalny identyfikator pozycji w koszyku
   cartId    String
   productId String
-  cart      Cart     @relation(fields: [cartId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+
+  cart Cart @relation(name: "CartToCartItems", fields: [cartId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+
   quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
