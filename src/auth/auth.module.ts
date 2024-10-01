@@ -18,5 +18,6 @@ import { DatabaseModule } from 'src/database/database.module';
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

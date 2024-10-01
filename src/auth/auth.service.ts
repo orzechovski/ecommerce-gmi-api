@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RegisterAuthDto } from './dto/regitser-auth.dto';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from 'src/database/database.service';
@@ -14,7 +14,18 @@ export class AuthService {
   async register(customer: RegisterAuthDto) {
     const { first_name, last_name, email, password, billing_address_id } =
       customer;
+
+    // Sprawdź, czy użytkownik o takim emailu już istnieje
+    const existingCustomer = await this.prisma.customer.findUnique({
+      where: { email },
+    });
+
+    if (existingCustomer) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     return this.prisma.customer.create({
       data: {
         first_name,
