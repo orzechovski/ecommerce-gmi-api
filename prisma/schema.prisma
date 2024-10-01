@@ -114,6 +114,8 @@ model Customer {
   email              String    @unique
   first_name         String
   last_name          String
+  password           String
+  role               Role      @default(USER)
   billing_address_id String
   phone              String?
   has_account        Boolean   @default(false)
@@ -123,4 +125,9 @@ model Customer {
   metadata           Json?
   carts              Cart[] // Relacja do koszyków
   orders             Order[] // Relacja do zamówień
+}
+
+enum Role {
+  USER
+  ADMIN
 }
