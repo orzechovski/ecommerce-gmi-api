@@ -1,22 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class CartService {
   constructor(private readonly prisma: DatabaseService) {}
 
-  // Dodawanie produktu do koszyka
   async addToCart(customerId: string, productId: string, quantity: number) {
+    // Sprawdzenie, czy użytkownik istnieje
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+    });
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    // Sprawdzenie, czy produkt istnieje
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    // Sprawdzenie, czy ilość nie przekracza dostępnej ilości produktu
+    if (quantity > product.stock) {
+      throw new BadRequestException(
+        'Requested quantity exceeds available stock',
+      );
+    }
+
     const cart = await this.prisma.cart.findFirst({
       where: { customer_id: customerId },
       include: { items: true },
     });
 
     if (!cart) {
+      // Tworzymy nowy koszyk dla klienta
       return this.prisma.cart.create({
         data: {
           customer_id: customerId,
-          email: await this.getCustomerEmail(customerId),
+          email: customer.email,
           items: {
             create: {
               productId,
@@ -32,11 +59,19 @@ export class CartService {
       );
 
       if (existingCartItem) {
+        // Aktualizacja ilości w koszyku
+        const newQuantity = existingCartItem.quantity + quantity;
+        if (newQuantity > product.stock) {
+          throw new BadRequestException(
+            'Requested quantity exceeds available stock',
+          );
+        }
         return this.prisma.cartItem.update({
           where: { id: existingCartItem.id },
-          data: { quantity: existingCartItem.quantity + quantity },
+          data: { quantity: newQuantity },
         });
       } else {
+        // Dodanie nowego produktu do koszyka
         return this.prisma.cartItem.create({
           data: {
             cartId: cart.id,

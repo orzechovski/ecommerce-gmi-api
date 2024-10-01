@@ -8,12 +8,12 @@ datasource db {
 }
 
 model Product {
-  id             String      @id @default(cuid()) // Unikalny identyfikator, string
+  id             String      @id @default(cuid())
   title          String
   subtitle       String?
   description    String
   is_giftcard    Boolean     @default(false)
-  status         String      @default("draft") // "draft", "published", etc.
+  status         String      @default("draft")
   thumbnail      String?
   profile_id     String?
   weight         Float?
@@ -33,51 +33,37 @@ model Product {
   updatedAt      DateTime    @updatedAt
   deletedAt      DateTime?
   metadata       Json?
-  OrderItems     OrderItem[] // Relacja do pozycji w zamówieniu
+  OrderItems     OrderItem[]
   CartItem       CartItem[]
+  stock          Int         @default(0)
 }
 
 model Order {
-  id                  String      @id @default(cuid())
-  status              String      @default("pending") // "pending", "completed", etc.
-  fulfillment_status  String      @default("not_fulfilled")
-  payment_status      String      @default("not_paid")
-  display_id          Int
-  cart_id             String
-  customer_id         String
-  email               String
-  billing_address_id  String
-  shipping_address_id String
-  region_id           String
-  currency_code       String
-  tax_rate            Float       @default(0)
-  draft_order_id      String?
-  canceled_at         DateTime?
-  no_notification     Boolean     @default(false)
-  idempotency_key     String?
-  external_id         String?
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-  deletedAt           DateTime?
-  metadata            Json?
-  items               OrderItem[] // Relacja do pozycji zamówień
-  Customer            Customer?   @relation(fields: [customerId], references: [id])
-  customerId          String?
+  id               String      @id @default(cuid())
+  status           String      @default("pending")
+  customer_id      String
+  payment_status   String      @default("not_paid")
+  shipping_address String
+  total_price      Float
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  items            OrderItem[]
+  customer         Customer    @relation(fields: [customer_id], references: [id])
 }
 
 model OrderItem {
   id        Int      @id @default(autoincrement())
   orderId   String
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  order     Order    @relation(fields: [orderId], references: [id])
   quantity  Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Cart {
-  id                    String    @id @default(cuid()) // Unikalny identyfikator koszyka
+  id                    String    @id @default(cuid())
   email                 String
   customer_id           String
   payment_session       Json?
@@ -98,7 +84,7 @@ model Cart {
 }
 
 model CartItem {
-  id        Int    @id @default(autoincrement()) // Unikalny identyfikator pozycji w koszyku
+  id        Int    @id @default(autoincrement())
   cartId    String
   productId String
 
@@ -125,8 +111,8 @@ model Customer {
   updatedAt          DateTime  @updatedAt
   deletedAt          DateTime?
   metadata           Json?
-  carts              Cart[] // Relacja do koszyków
-  orders             Order[] // Relacja do zamówień
+  carts              Cart[]
+  orders             Order[]
 }
 
 enum Role {

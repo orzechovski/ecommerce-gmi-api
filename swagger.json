@@ -1,0 +1,636 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/swagger.json": {
+      "get": {
+        "operationId": "AppController_getSwaggerJson",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/api/cart/add": {
+      "post": {
+        "operationId": "CartController_addToCart",
+        "summary": "Add product to cart",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product added to cart successfully."
+          },
+          "400": {
+            "description": "Invalid input or quantity exceeds available stock."
+          },
+          "404": {
+            "description": "Customer or product not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/api/cart/remove": {
+      "delete": {
+        "operationId": "CartController_removeFromCart",
+        "summary": "Remove product from cart",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveFromCartDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product removed from cart successfully."
+          },
+          "400": {
+            "description": "Invalid input."
+          },
+          "404": {
+            "description": "Customer or product not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/api/cart/{customerId}": {
+      "get": {
+        "operationId": "CartController_getCart",
+        "summary": "Get cart for customer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cart retrieved successfully."
+          },
+          "404": {
+            "description": "Cart not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "operationId": "OrdersController_findAll",
+        "summary": "Retrieve all orders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Orders retrieved successfully."
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      },
+      "post": {
+        "operationId": "OrdersController_createOrder",
+        "summary": "Create a new order from customer cart",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully."
+          },
+          "404": {
+            "description": "Cart is empty or customer not found."
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "operationId": "OrdersController_getOrders",
+        "summary": "Retrieve orders for a specific customer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer orders retrieved successfully."
+          },
+          "404": {
+            "description": "Customer not found."
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      },
+      "delete": {
+        "operationId": "OrdersController_deleteOrder",
+        "summary": "Delete an order by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order deleted successfully."
+          },
+          "404": {
+            "description": "Order not found."
+          }
+        },
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "summary": "Register a new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterAuthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "User already exists"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "Login an existing user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginAuthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User logged in successfully"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/products": {
+      "post": {
+        "operationId": "ProductsController_create",
+        "summary": "Create a new product",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The record has been successfully created."
+          },
+          "400": {
+            "description": "Validation error."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "get": {
+        "operationId": "ProductsController_findAll",
+        "summary": "Get all products",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all products."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "operationId": "ProductsController_findOne",
+        "summary": "Get a product by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found."
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "patch": {
+        "operationId": "ProductsController_update",
+        "summary": "Update a product by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The record has been successfully updated."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "delete": {
+        "operationId": "ProductsController_remove",
+        "summary": "Delete a product by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The record has been successfully deleted."
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "E-commerce GMI API",
+    "description": "API documentation for the E-commerce gmi project",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "AddToCartDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer",
+            "example": "customer_123"
+          },
+          "productId": {
+            "type": "string",
+            "description": "ID of the product",
+            "example": "product_123"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity of the product to add",
+            "example": 2
+          }
+        },
+        "required": [
+          "customerId",
+          "productId",
+          "quantity"
+        ]
+      },
+      "RemoveFromCartDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer",
+            "example": "customer_123"
+          },
+          "productId": {
+            "type": "string",
+            "description": "ID of the product",
+            "example": "product_123"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity of the product to remove",
+            "example": 1
+          }
+        },
+        "required": [
+          "customerId",
+          "productId",
+          "quantity"
+        ]
+      },
+      "CreateOrderDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer",
+            "example": "customer_123"
+          }
+        },
+        "required": [
+          "customerId"
+        ]
+      },
+      "RegisterAuthDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "User email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "User password, minimum length 6"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John",
+            "description": "First name of the user"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe",
+            "description": "Last name of the user"
+          },
+          "billing_address_id": {
+            "type": "string",
+            "example": "address_123",
+            "description": "Billing address ID"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "first_name",
+          "last_name",
+          "billing_address_id"
+        ]
+      },
+      "LoginAuthDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "User email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "User password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the product",
+            "example": "New Product"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Subtitle of the product",
+            "example": "Product Subtitle"
+          },
+          "stock": {
+            "type": "number",
+            "description": "Number of items in stock",
+            "example": 10
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the product",
+            "example": "This is a great product"
+          },
+          "is_giftcard": {
+            "type": "boolean",
+            "description": "Is this a gift card?",
+            "example": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the product",
+            "example": "published"
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "Thumbnail image URL",
+            "example": "http://example.com/image.jpg"
+          },
+          "profile_id": {
+            "type": "string",
+            "description": "Profile ID for the product"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Weight of the product",
+            "example": 1.2
+          },
+          "price": {
+            "type": "number",
+            "description": "Price of the product",
+            "example": 49.99
+          },
+          "length": {
+            "type": "number",
+            "description": "Length of the product",
+            "example": 10
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the product",
+            "example": 5
+          },
+          "width": {
+            "type": "number",
+            "description": "Width of the product",
+            "example": 3
+          },
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code of the product"
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "Country of origin"
+          },
+          "mid_code": {
+            "type": "string",
+            "description": "MID Code of the product"
+          },
+          "material": {
+            "type": "string",
+            "description": "Material used for the product"
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "Collection ID for the product"
+          },
+          "type_id": {
+            "type": "string",
+            "description": "Type ID for the product"
+          },
+          "discountable": {
+            "type": "boolean",
+            "description": "Is the product discountable?",
+            "example": true
+          },
+          "external_id": {
+            "type": "string",
+            "description": "External ID for the product"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for the product"
+          }
+        },
+        "required": [
+          "title",
+          "stock",
+          "description",
+          "price"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}
