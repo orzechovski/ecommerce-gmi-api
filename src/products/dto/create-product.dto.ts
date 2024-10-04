@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 export class CreateProductDto {
   @ApiProperty({ description: 'Title of the product', example: 'New Product' })
@@ -162,5 +163,5 @@ export class CreateProductDto {
     required: false,
   })
   @IsOptional()
-  metadata?: Record<string, any>;
+  metadata?: JsonValue;
 }
