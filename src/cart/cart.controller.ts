@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { AddToCartDto, CartDto, RemoveFromCartDto } from './dto/cart.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../src/auth/guards/jwt.guard';
 
 @ApiTags('Cart')
 @Controller('cart')

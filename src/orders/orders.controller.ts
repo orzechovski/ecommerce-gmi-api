@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { JwtAuthGuard } from '../../src/auth/guards/jwt.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
