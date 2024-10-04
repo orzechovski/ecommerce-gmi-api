@@ -2,7 +2,8 @@ import { Controller, Get, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { readFileSync } from 'fs';
 import { Response } from 'express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController, ApiTags } from '@nestjs/swagger';
+@ApiExcludeController()
 @ApiTags('App')
 @Controller()
 export class AppController {

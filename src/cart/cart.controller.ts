@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { AddToCartDto, RemoveFromCartDto } from './dto/cart.dto';
+import { AddToCartDto, CartDto, RemoveFromCartDto } from './dto/cart.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Cart')
@@ -55,9 +55,24 @@ export class CartController {
 
   @Get(':customerId')
   @ApiOperation({ summary: 'Get cart for customer' })
-  @ApiResponse({ status: 200, description: 'Cart retrieved successfully.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cart retrieved successfully.',
+    type: CartDto,
+  })
   @ApiResponse({ status: 404, description: 'Cart not found.' })
   getCart(@Param('customerId') customerId: string) {
     return this.cartService.getCart(customerId);
+  }
+
+  @Get(':customerId/item-count')
+  @ApiOperation({ summary: 'Get total item count in cart' })
+  @ApiResponse({
+    status: 200,
+    description: 'Item count retrieved successfully.',
+  })
+  @ApiResponse({ status: 404, description: 'Cart not found.' })
+  getCartItemCount(@Param('customerId') customerId: string) {
+    return this.cartService.getCartItemCount(customerId);
   }
 }

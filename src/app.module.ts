@@ -10,6 +10,8 @@ import { CartController } from './cart/cart.controller';
 import { OrdersService } from './orders/orders.service';
 import { OrdersController } from './orders/orders.controller';
 import { OrdersModule } from './orders/orders.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -18,8 +20,28 @@ import { OrdersModule } from './orders/orders.module';
     ConfigModule.forRoot(),
     ProductsModule,
     OrdersModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
   ],
   controllers: [AppController, CartController, OrdersController],
-  providers: [AppService, CartService, OrdersService],
+  providers: [
+    AppService,
+    CartService,
+    OrdersService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

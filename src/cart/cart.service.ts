@@ -4,13 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { CartDto } from './dto/cart.dto';
 
 @Injectable()
 export class CartService {
   constructor(private readonly prisma: DatabaseService) {}
 
   async addToCart(customerId: string, productId: string, quantity: number) {
-    // Sprawdzenie, czy użytkownik istnieje
     const customer = await this.prisma.customer.findUnique({
       where: { id: customerId },
     });
@@ -18,7 +18,6 @@ export class CartService {
       throw new NotFoundException('Customer not found');
     }
 
-    // Sprawdzenie, czy produkt istnieje
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
@@ -26,7 +25,6 @@ export class CartService {
       throw new NotFoundException('Product not found');
     }
 
-    // Sprawdzenie, czy ilość nie przekracza dostępnej ilości produktu
     if (quantity > product.stock) {
       throw new BadRequestException(
         'Requested quantity exceeds available stock',
@@ -39,7 +37,6 @@ export class CartService {
     });
 
     if (!cart) {
-      // Tworzymy nowy koszyk dla klienta
       return this.prisma.cart.create({
         data: {
           customer_id: customerId,
@@ -59,7 +56,6 @@ export class CartService {
       );
 
       if (existingCartItem) {
-        // Aktualizacja ilości w koszyku
         const newQuantity = existingCartItem.quantity + quantity;
         if (newQuantity > product.stock) {
           throw new BadRequestException(
@@ -71,7 +67,6 @@ export class CartService {
           data: { quantity: newQuantity },
         });
       } else {
-        // Dodanie nowego produktu do koszyka
         return this.prisma.cartItem.create({
           data: {
             cartId: cart.id,
@@ -83,7 +78,6 @@ export class CartService {
     }
   }
 
-  // Usuwanie produktu z koszyka
   async removeFromCart(
     customerId: string,
     productId: string,
@@ -97,36 +91,42 @@ export class CartService {
     if (!cart) throw new Error('Cart not found');
 
     const cartItem = cart.items.find((item) => item.productId === productId);
-    if (!cartItem) throw new Error('Product not found in cart');
+    if (!cartItem) throw new NotFoundException('Product not found in cart');
 
-    // Sprawdź, czy ilość w koszyku jest większa niż ilość, którą chcemy usunąć
     if (cartItem.quantity > quantity) {
-      // Zmniejsz ilość produktu w koszyku
       return this.prisma.cartItem.update({
         where: { id: cartItem.id },
         data: { quantity: cartItem.quantity - quantity },
       });
     } else {
-      // Jeśli ilość jest mniejsza lub równa, usuń element z koszyka
       return this.prisma.cartItem.delete({
         where: { id: cartItem.id },
       });
     }
   }
 
-  // Wyświetlanie zawartości koszyka
-  async getCart(customerId: string) {
+  async getCart(customerId: string): Promise<CartDto | null> {
     return this.prisma.cart.findFirst({
       where: { customer_id: customerId },
       include: { items: { include: { product: true } } },
     });
   }
 
-  private async getCustomerEmail(customerId: string): Promise<string> {
-    const customer = await this.prisma.customer.findUnique({
-      where: { id: customerId },
-      select: { email: true },
+  async getCartItemCount(customerId: string): Promise<number> {
+    const cart = await this.prisma.cart.findFirst({
+      where: { customer_id: customerId },
+      include: { items: true },
     });
-    return customer?.email || '';
+
+    if (!cart) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    const itemCount = cart.items.reduce(
+      (total, item) => total + item.quantity,
+      0,
+    );
+
+    return itemCount;
   }
 }

@@ -11,6 +11,7 @@ import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { OrderDto } from './dto/order.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -42,6 +43,8 @@ export class OrdersController {
   @ApiResponse({
     status: 200,
     description: 'Customer orders retrieved successfully.',
+    type: OrderDto,
+    isArray: true,
   })
   @ApiResponse({ status: 404, description: 'Customer not found.' })
   getOrders(@Param('id') customerId: string) {

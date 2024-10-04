@@ -16,6 +16,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ProductDto } from './dto/product.dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -40,7 +41,12 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all products' })
-  @ApiResponse({ status: 200, description: 'List of all products.' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all products.',
+    type: ProductDto,
+    isArray: true,
+  })
   findAll() {
     return this.productsService.findAll();
   }
