@@ -106,10 +106,29 @@ export class CartService {
   }
 
   async getCart(customerId: string): Promise<CartDto | null> {
-    return this.prisma.cart.findFirst({
+    const cart = await this.prisma.cart.findFirst({
       where: { customer_id: customerId },
       include: { items: { include: { product: true } } },
     });
+
+    if (!cart) {
+      return null;
+    }
+
+    const formattedCart = {
+      ...cart,
+      items: cart.items.map((item) => ({
+        ...item,
+        id: String(item.id),
+        productId: String(item.productId),
+        product: {
+          ...item.product,
+          id: String(item.product.id),
+        },
+      })),
+    };
+
+    return formattedCart as CartDto; // Explicitly cast to CartDto
   }
 
   async getCartItemCount(customerId: string): Promise<number> {
