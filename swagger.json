@@ -1,20 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/swagger.json": {
-      "get": {
-        "operationId": "AppController_getSwaggerJson",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "App"
-        ]
-      }
-    },
     "/api/cart/add": {
       "post": {
         "operationId": "CartController_addToCart",
@@ -93,7 +79,41 @@
         ],
         "responses": {
           "200": {
-            "description": "Cart retrieved successfully."
+            "description": "Cart retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cart not found."
+          }
+        },
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/api/cart/{customerId}/item-count": {
+      "get": {
+        "operationId": "CartController_getCartItemCount",
+        "summary": "Get total item count in cart",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item count retrieved successfully."
           },
           "404": {
             "description": "Cart not found."
@@ -164,7 +184,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Customer orders retrieved successfully."
+            "description": "Customer orders retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderDto"
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Customer not found."
@@ -244,6 +274,16 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          },
           "201": {
             "description": "User logged in successfully"
           },
@@ -289,7 +329,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "List of all products."
+            "description": "List of all products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductDto"
+                  }
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -446,6 +496,294 @@
           "quantity"
         ]
       },
+      "ProductDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the product",
+            "example": "Sample Product"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Subtitle of the product",
+            "example": "Sample Subtitle",
+            "nullable": true
+          },
+          "stock": {
+            "type": "number",
+            "description": "Stock available for the product",
+            "example": 2
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the product",
+            "example": "This is a sample product for testing."
+          },
+          "is_giftcard": {
+            "type": "boolean",
+            "description": "Is this product a gift card?",
+            "example": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the product",
+            "example": "draft"
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "Thumbnail URL",
+            "example": null,
+            "nullable": true
+          },
+          "profile_id": {
+            "type": "string",
+            "description": "Profile ID associated with the product",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "description": "Weight of the product",
+            "example": 1.2,
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "description": "Price of the product",
+            "example": 49.99
+          },
+          "length": {
+            "type": "number",
+            "description": "Length of the product",
+            "example": null,
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the product",
+            "example": null,
+            "nullable": true
+          },
+          "width": {
+            "type": "number",
+            "description": "Width of the product",
+            "example": null,
+            "nullable": true
+          },
+          "hs_code": {
+            "type": "string",
+            "description": "HS Code of the product",
+            "example": null,
+            "nullable": true
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "Country of origin",
+            "example": null,
+            "nullable": true
+          },
+          "mid_code": {
+            "type": "string",
+            "description": "MID code of the product",
+            "example": null,
+            "nullable": true
+          },
+          "material": {
+            "type": "string",
+            "description": "Material used in the product",
+            "example": null,
+            "nullable": true
+          },
+          "collection_id": {
+            "type": "string",
+            "description": "Collection ID the product belongs to",
+            "example": null,
+            "nullable": true
+          },
+          "type_id": {
+            "type": "string",
+            "description": "Product type ID",
+            "example": null,
+            "nullable": true
+          },
+          "discountable": {
+            "type": "boolean",
+            "description": "Is the product discountable?",
+            "example": true
+          },
+          "external_id": {
+            "type": "string",
+            "description": "External ID of the product",
+            "example": null,
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata for the product",
+            "example": null,
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the product",
+            "example": "cm1tmifx60001ntuqpp2v6x7i"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation date of the product",
+            "example": "2024-10-03T18:22:03.516Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update date of the product",
+            "example": "2024-10-03T18:22:03.516Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Deletion date of the product, if deleted",
+            "example": null,
+            "nullable": true
+          }
+        },
+        "required": [
+          "title",
+          "stock",
+          "description",
+          "price",
+          "id",
+          "createdAt",
+          "updatedAt",
+          "deletedAt"
+        ]
+      },
+      "CartItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "cartId": {
+            "type": "string",
+            "description": "ID of the cart item",
+            "example": "cart-item-123"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductDto"
+          }
+        },
+        "required": [
+          "id",
+          "cartId",
+          "productId",
+          "quantity",
+          "createdAt",
+          "updatedAt",
+          "product"
+        ]
+      },
+      "CartDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "payment_session": {
+            "type": "object",
+            "nullable": true,
+            "description": "Can be a string, number, or object (JSON)"
+          },
+          "payment_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string"
+          },
+          "completed_at": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "payment_authorized_at": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "idempotency_key": {
+            "type": "string",
+            "nullable": true
+          },
+          "context": {
+            "type": "object",
+            "nullable": true,
+            "description": "Can be any valid JSON value"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true,
+            "description": "Can be any valid JSON value"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "customer_id",
+          "payment_session",
+          "payment_id",
+          "type",
+          "completed_at",
+          "payment_authorized_at",
+          "idempotency_key",
+          "context",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "metadata",
+          "items"
+        ]
+      },
       "CreateOrderDto": {
         "type": "object",
         "properties": {
@@ -457,6 +795,71 @@
         },
         "required": [
           "customerId"
+        ]
+      },
+      "OrderDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the order",
+            "example": "cm1uje1uj0007k0mgpe1bogcg"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the order",
+            "example": "pending"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "ID of the customer who placed the order",
+            "example": "cm1tky5ax0000ntuqy6b1exsm"
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Current payment status of the order",
+            "example": "not_paid"
+          },
+          "shipping_address": {
+            "type": "string",
+            "description": "Shipping address for the order",
+            "example": "Test Address"
+          },
+          "total_price": {
+            "type": "number",
+            "description": "Total price of the order",
+            "example": 4519.95
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the order was created",
+            "example": "2024-10-04T09:42:26.011Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the order was last updated",
+            "example": "2024-10-04T09:42:26.011Z"
+          },
+          "items": {
+            "description": "List of items included in the order",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "customer_id",
+          "payment_status",
+          "shipping_address",
+          "total_price",
+          "createdAt",
+          "updatedAt",
+          "items"
         ]
       },
       "RegisterAuthDto": {
@@ -490,10 +893,7 @@
         },
         "required": [
           "email",
-          "password",
-          "first_name",
-          "last_name",
-          "billing_address_id"
+          "password"
         ]
       },
       "LoginAuthDto": {
@@ -513,6 +913,19 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Access token for the user",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "required": [
+          "access_token"
         ]
       },
       "CreateProductDto": {

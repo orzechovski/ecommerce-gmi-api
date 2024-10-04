@@ -52,7 +52,7 @@ model Order {
 }
 
 model OrderItem {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   orderId   String
   productId String
   quantity  Int
@@ -84,7 +84,7 @@ model Cart {
 }
 
 model CartItem {
-  id        Int    @id @default(autoincrement())
+  id        String @id @default(cuid())
   cartId    String
   productId String
 
@@ -100,11 +100,11 @@ model CartItem {
 model Customer {
   id                 String    @id @default(cuid())
   email              String    @unique
-  first_name         String
-  last_name          String
+  first_name         String?
+  last_name          String?
   password           String
   role               Role      @default(USER)
-  billing_address_id String
+  billing_address_id String?
   phone              String?
   has_account        Boolean   @default(false)
   createdAt          DateTime  @default(now())
