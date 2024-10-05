@@ -38,23 +38,19 @@ export class RolesGuard implements CanActivate {
 
     let user;
     try {
-      // Verify the token and decode it
       user = await this.jwtService.verifyAsync(token);
     } catch (error: any) {
       throw new UnauthorizedException(error?.message || 'Invalid token');
     }
 
-    // If no roles are required for this route, grant access
     if (!requiredRoles) {
       return true;
     }
 
-    // Check if the user has one of the required roles
     if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException('You do not have the required role');
     }
 
-    // Attach the user to the request (optional but useful)
     request.user = user;
 
     return true;

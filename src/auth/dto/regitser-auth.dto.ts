@@ -37,4 +37,8 @@ export class RegisterAuthDto {
   @IsOptional()
   @IsString()
   billing_address_id?: string;
+
+  @IsString()
+  @IsOptional() // Opcjonalne pole klucza do weryfikacji administratora
+  adminSecretKey?: string;
 }

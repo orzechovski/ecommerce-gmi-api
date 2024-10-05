@@ -15,8 +15,14 @@ export class AuthService {
   ) {}
 
   async register(customer: RegisterAuthDto) {
-    const { first_name, last_name, email, password, billing_address_id } =
-      customer;
+    const {
+      first_name,
+      last_name,
+      email,
+      password,
+      billing_address_id,
+      adminSecretKey,
+    } = customer;
 
     // Sprawdź, czy użytkownik o takim emailu już istnieje
     const existingCustomer = await this.prisma.customer.findUnique({
@@ -25,6 +31,12 @@ export class AuthService {
 
     if (existingCustomer) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    const correctAdminSecretKey = process.env.ADMIN_SECRET_KEY;
+
+    if (adminSecretKey && adminSecretKey !== correctAdminSecretKey) {
+      throw new HttpException('Invalid admin secret key', HttpStatus.FORBIDDEN);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,7 +48,7 @@ export class AuthService {
         email,
         billing_address_id,
         password: hashedPassword,
-        role: 'USER',
+        role: correctAdminSecretKey === adminSecretKey ? 'ADMIN' : 'USER',
       },
     });
   }
