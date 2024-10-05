@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build-test-and-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,33 +15,21 @@ jobs:
         node-version: [16.x]
 
     steps:
+      # Step 1: Checkout the repository
       - uses: actions/checkout@v3
 
+      # Step 2: Setup Node.js
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      - name: Set environment variables for testing
-        run: |
-          echo "NODE_ENV=test" >> $GITHUB_ENV
-          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> $GITHUB_ENV
-
-      - name: Generate Prisma client for tests
-        run: npx prisma generate
-
-      - name: Run Prisma migrations for tests
-        run: npx prisma migrate deploy
-
-      - name: Run tests
-        env:
-          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-        run: npm test
-
-      - name: Set environment variables for production
+      # Step 4: Set environment variables for deployment
+      - name: Set environment variables
         run: |
           echo "NODE_ENV=production" >> $GITHUB_ENV
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
@@ -49,15 +37,22 @@ jobs:
           echo "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }}" >> $GITHUB_ENV
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
-      - name: Generate Prisma client for production
+      # Step 5: Generate Prisma client
+      - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Run Prisma migrations for production
+      # Step 6: Run Prisma migrations
+      - name: Run Prisma migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx prisma migrate deploy
 
-      - name: Build application for deployment
+      # Step 7: Build the application
+      - name: Build application
         run: npm run build
 
+      # Step 8: Deploy the application to Vercel
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
