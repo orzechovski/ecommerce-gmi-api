@@ -7,15 +7,9 @@ export const mockProducts = [
     description: 'This is an example product description.',
     price: 99.99,
     stock: 50,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
-    metadata: {},
     status: 'available',
-    length: 10,
-    subtitle: 'Example subtitle 1',
-    thumbnail: '',
     weight: 1.5,
+    length: 10,
     width: 5,
     height: 3,
     origin_country: 'US',
@@ -26,23 +20,15 @@ export const mockProducts = [
     is_giftcard: false,
     discountable: true,
     profile_id: 'profile_123',
-    mid_code: 'MID123',
-    external_id: 'external_123',
   },
   {
     title: 'Example Product 2',
     description: 'This is another example product description.',
     price: 199.99,
     stock: 30,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
-    metadata: {},
     status: 'available',
-    length: 15,
-    subtitle: 'Example subtitle 2',
-    thumbnail: '',
     weight: 2.0,
+    length: 15,
     width: 6,
     height: 4,
     origin_country: 'US',
@@ -53,19 +39,19 @@ export const mockProducts = [
     is_giftcard: false,
     discountable: true,
     profile_id: 'profile_456',
-    mid_code: 'MID456',
-    external_id: 'external_456',
   },
 ];
 
 export const mockUser = {
-  id: 'user_12345',
-  first_name: 'John',
-  last_name: 'Doe',
+  email: 'john.doe@example.com',
+  password: 'admin123',
+  role: 'USER',
+};
+
+export const mockAdmin = {
   email: 'john.doe@example.com',
   password: 'admin123',
   role: 'ADMIN',
-  billing_address_id: 'billing_id_123',
 };
 
 export const registerUser = async (app: INestApplication, user: any) => {
