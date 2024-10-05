@@ -15,20 +15,16 @@ jobs:
         node-version: [16.x]
 
     steps:
-      # Step 1: Checkout the repository
       - uses: actions/checkout@v3
 
-      # Step 2: Setup Node.js
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Set environment variables for deployment
       - name: Set environment variables
         run: |
           echo "NODE_ENV=production" >> $GITHUB_ENV
@@ -37,22 +33,19 @@ jobs:
           echo "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }}" >> $GITHUB_ENV
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
-      # Step 5: Generate Prisma client
       - name: Generate Prisma client
         run: npx prisma generate
 
-      # Step 6: Run Prisma migrations
       - name: Run Prisma migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx prisma migrate deploy
 
-      # Step 7: Build the application
       - name: Build application
         run: npm run build
 
-      # Step 8: Deploy the application to Vercel
+      # Step to deploy to Vercel with project ID and org ID
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -63,3 +56,5 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} # Add project ID here
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} # Add org ID here
