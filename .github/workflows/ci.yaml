@@ -45,7 +45,7 @@ jobs:
       - name: Build application
         run: npm run build
 
-      # Step to deploy to Vercel with project ID and org ID
+      # Vercel deployment without project or org IDs
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -56,5 +56,3 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} # Add project ID here
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} # Add org ID here
