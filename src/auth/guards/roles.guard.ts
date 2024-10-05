@@ -1,39 +1,62 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Observable } from 'rxjs';
-import { Roles } from '../decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
-    private reflector: Reflector,
-    private jwtService: JwtService,
+    private readonly reflector: Reflector,
+    private readonly jwtService: JwtService,
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(Roles, [
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
+    const request = context.switchToHttp().getRequest();
+    const authorizationHeader = request.headers['authorization'];
+
+    if (!authorizationHeader) {
+      throw new UnauthorizedException('Authorization header is missing');
+    }
+
+    const token = authorizationHeader.split(' ')[1];
+
+    if (!token) {
+      throw new UnauthorizedException('Token is missing');
+    }
+
+    let user;
+    try {
+      // Verify the token and decode it
+      user = await this.jwtService.verifyAsync(token);
+    } catch (error: any) {
+      throw new UnauthorizedException(error?.message || 'Invalid token');
+    }
+
+    // If no roles are required for this route, grant access
     if (!requiredRoles) {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
-    const authorizationHeader = request.headers['authorization'];
-    const token = authorizationHeader && authorizationHeader.split(' ')[1];
-
-    if (!token) {
-      return false;
+    // Check if the user has one of the required roles
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException('You do not have the required role');
     }
 
-    const user = this.jwtService.decode(token) as { role: Role };
+    // Attach the user to the request (optional but useful)
+    request.user = user;
 
-    return requiredRoles.includes(user.role);
+    return true;
   }
 }
