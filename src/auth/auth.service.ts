@@ -41,6 +41,11 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const role =
+      correctAdminSecretKey !== '' && adminSecretKey === correctAdminSecretKey
+        ? 'ADMIN'
+        : 'USER';
+
     return this.prisma.customer.create({
       data: {
         first_name,
@@ -48,7 +53,7 @@ export class AuthService {
         email,
         billing_address_id,
         password: hashedPassword,
-        role: correctAdminSecretKey === adminSecretKey ? 'ADMIN' : 'USER',
+        role,
       },
     });
   }
