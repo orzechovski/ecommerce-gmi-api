@@ -34,6 +34,13 @@ export class OrdersService {
           })),
         },
       },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
     });
 
     await this.prisma.cartItem.deleteMany({

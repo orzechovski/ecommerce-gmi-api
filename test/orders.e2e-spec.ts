@@ -49,32 +49,39 @@ describe('OrdersController (e2e)', () => {
   });
 
   it('should create an order from the cart', async () => {
+    // Dodaj produkt do bazy danych
     const product = await prisma.product.create({
       data: mockProducts[0],
     });
 
+    // Dodaj produkt do koszyka klienta
     await request(app.getHttpServer())
       .post('/cart/add')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({ customerId, productId: product.id, quantity: 2 })
       .expect(HttpStatus.CREATED);
 
+    // Utwórz zamówienie
     const response = await request(app.getHttpServer())
       .post('/orders')
       .set('Authorization', `Bearer ${accessToken}`)
+      .send({ customerId }) // Wysyłanie customerId w żądaniu
       .expect(HttpStatus.CREATED);
 
+    // Sprawdź, czy zamówienie zostało poprawnie utworzone
     expect(response.body).toHaveProperty('status', 'pending');
     expect(response.body).toHaveProperty('total_price');
     expect(response.body.items.length).toBeGreaterThan(0);
   });
 
   it('should get all orders for the customer', async () => {
+    // Pobierz wszystkie zamówienia dla klienta
     const response = await request(app.getHttpServer())
       .get('/orders')
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(HttpStatus.OK);
 
+    // Sprawdź, czy lista zamówień nie jest pusta
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
   });
