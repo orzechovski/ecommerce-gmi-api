@@ -1,0 +1,70 @@
+name: CI and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set environment variables for testing
+        run: |
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> $GITHUB_ENV
+
+      - name: Generate Prisma client for tests
+        run: npx prisma generate
+
+      - name: Run Prisma migrations for tests
+        run: npx prisma migrate deploy
+
+      - name: Run tests
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        run: npm test
+
+      - name: Set environment variables for production
+        run: |
+          echo "NODE_ENV=production" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
+          echo "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
+      - name: Generate Prisma client for production
+        run: npx prisma generate
+
+      - name: Run Prisma migrations for production
+        run: npx prisma migrate deploy
+
+      - name: Build application for deployment
+        run: npm run build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prod'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}

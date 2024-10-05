@@ -17,7 +17,10 @@ import { APP_GUARD } from '@nestjs/core';
   imports: [
     DatabaseModule,
     AuthModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+    }),
     ProductsModule,
     OrdersModule,
     ThrottlerModule.forRoot([
